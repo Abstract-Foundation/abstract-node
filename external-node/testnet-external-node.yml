@@ -5,7 +5,7 @@ services:
     volumes:
       - testnet-prometheus-data:/prometheus
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-    expose:
+    ports:
       - 9090
   grafana:
     image: grafana/grafana:9.3.6
@@ -48,7 +48,7 @@ services:
         ]
     environment:
       - POSTGRES_PASSWORD=notsecurepassword
-      - PGPORT=5430
+      - PGPORT=5432
   external-node:
     image: "matterlabs/external-node:2.0-v24.6.0"
     depends_on:
