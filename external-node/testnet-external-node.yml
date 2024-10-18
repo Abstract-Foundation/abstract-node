@@ -85,7 +85,7 @@ services:
     expose:
       - 3322
     environment:
-      DATABASE_URL: "postgres://postgres:notsecurepassword@postgres:5430/zksync_local_ext_node"
+      DATABASE_URL: "postgres://postgres:notsecurepassword@postgres:5430/abstract_local_ext_node"
       DATABASE_POOL_SIZE: 10
 
       EN_HTTP_PORT: 3060
@@ -93,15 +93,15 @@ services:
       EN_HEALTHCHECK_PORT: 3081
       EN_PROMETHEUS_PORT: 3322
       EN_ETH_CLIENT_URL: https://ethereum-sepolia-rpc.publicnode.com
-      EN_MAIN_NODE_URL: https://sepolia.era.zksync.dev
+      EN_MAIN_NODE_URL: https://api.testnet.abs.xyz
       EN_L1_CHAIN_ID: 11155111
-      EN_L2_CHAIN_ID: 300
+      EN_L2_CHAIN_ID: 11124
       EN_PRUNING_ENABLED: true
 
       EN_STATE_CACHE_PATH: "./db/ext-node/state_keeper"
       EN_MERKLE_TREE_PATH: "./db/ext-node/lightweight"
       EN_SNAPSHOTS_RECOVERY_ENABLED: "true"
-      EN_SNAPSHOTS_OBJECT_STORE_BUCKET_BASE_URL: "zksync-era-boojnet-external-node-snapshots"
+      EN_SNAPSHOTS_OBJECT_STORE_BUCKET_BASE_URL: "abstract-testnet-external-node-snapshots"
       EN_SNAPSHOTS_OBJECT_STORE_MODE: "GCSAnonymousReadOnly"
       RUST_LOG: "warn,zksync=info,zksync_core::metadata_calculator=debug,zksync_state=debug,zksync_utils=debug,zksync_web3_decl::client=error"
 
