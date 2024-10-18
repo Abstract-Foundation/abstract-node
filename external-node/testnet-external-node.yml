@@ -65,7 +65,7 @@ services:
     entrypoint:
       [
       "/usr/bin/entrypoint.sh",
-      "--enable-consensus",
+      "--enable-consensus=false",
       ]
     restart: always
     depends_on:
