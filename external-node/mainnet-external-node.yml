@@ -80,8 +80,8 @@ services:
       EN_PROMETHEUS_PORT: 3322
       EN_ETH_CLIENT_URL: https://eth.llamarpc.com
       EN_MAIN_NODE_URL: https://api.mainnet.abs.xyz
-      EN_L1_CHAIN_ID: 2741
-      EN_L2_CHAIN_ID: 1
+      EN_L1_CHAIN_ID: 1
+      EN_L2_CHAIN_ID: 2741
       EN_PRUNING_ENABLED: true
 
       EN_GAS_PRICE_SCALE_FACTOR: "1.5"
