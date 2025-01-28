@@ -1,4 +1,4 @@
-name: "testnet-node"
+name: "mainnet-node"
 services:
   prometheus:
     image: prom/prometheus:v2.35.0
