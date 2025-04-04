@@ -1,0 +1,8 @@
+root = true
+
+[*]
+trim_trailing_whitespace = false
+indent_style = space
+
+[*.{yaml,yml}]
+indent_size = 2

@@ -1,11 +1,11 @@
 apiVersion: 1
 
 providers:
-  - name: 'Default'  # Name of the dashboard provider
+  - name: "Default" # Name of the dashboard provider
     orgId: 1
-    folder: ''
+    folder: ""
     type: file
     disableDeletion: false
-    updateIntervalSeconds: 10  # How often Grafana will scan for changed dashboards
+    updateIntervalSeconds: 10 # How often Grafana will scan for changed dashboards
     options:
       path: /etc/grafana/provisioning/dashboards

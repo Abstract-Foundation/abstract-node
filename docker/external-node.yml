@@ -51,10 +51,7 @@ services:
       - PGPORT=5430
   external-node:
     image: "matterlabs/external-node:${EN_VERSION:-v26.8.5}"
-    entrypoint:
-      [
-      "/usr/bin/entrypoint.sh",
-      ]
+    entrypoint: ["/usr/bin/entrypoint.sh"]
     restart: always
     depends_on:
       postgres:
