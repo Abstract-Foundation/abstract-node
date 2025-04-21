@@ -311,3 +311,15 @@ readinessProbe:
     path: /en/readiness
     port: sidecar
     scheme: HTTP
+
+## For using CNPG (Cloud Native PostgreSQL)
+## If enabled the cluster will be created and the database will be used by the node
+## ref: https://github.com/cloudnative-pg/cloudnative-pg
+##
+cnpg:
+  enabled: false
+  instances: 1
+  affinity: {}
+  storageClass: ""
+  storageSize: 250Gi
+  enablePodMonitor: true

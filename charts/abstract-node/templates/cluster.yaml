@@ -1,0 +1,19 @@
+{{- if .Values.cnpg.enabled }}
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+spec:
+{{- with .Values.affinity }}
+  affinity:
+    {{ toYaml . | nindent 8 | trim }}
+{{- end }}
+  instances: {{ Values.cnpg.instances }}
+  storage:
+    storageClass: {{ .Values.cnpg.storageClass }}
+    size: {{ .Values.cnpg.storageSize }}
+  monitoring:
+    enablePodMonitor: {{ .Values.cnpg.enablePodMonitor }}
+{{- end }}
