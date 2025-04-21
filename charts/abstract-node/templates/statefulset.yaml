@@ -1,0 +1,200 @@
+---
+apiVersion: {{ include "common.capabilities.statefulset.apiVersion" . }}
+kind: StatefulSet
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  labels:
+    {{- include "common.labels.statefulset" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.global.replicaCount }}
+  podManagementPolicy: "Parallel"
+  selector:
+    matchLabels:
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
+  serviceName: {{ include "common.names.fullname" . }}
+  template:
+    metadata:
+      labels:
+        {{- include "common.labels.matchLabels" . | nindent 8 }}
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+    {{- with (concat .Values.imagePullSecrets .Values.global.imagePullSecrets) }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.securityContext }}
+      securityContext:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- if .Values.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+    {{- end }}
+      serviceAccountName: {{ include "common.names.serviceAccountName" . }}
+      priorityClassName: {{ .Values.priorityClassName | quote }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.database.secretName }}
+                  key: {{ .Values.database.secretKey }}
+                  optional: false
+            - name: EN_GAS_PRICE_SCALE_FACTOR
+              value: "1.5"
+            - name: EN_ESTIMATE_GAS_SCALE_FACTOR
+              value: "1.3"
+            - name: EN_ESTIMATE_GAS_ACCEPTABLE_OVERESTIMATION
+              value: "5000"
+            - name: DATABASE_POOL_SIZE
+              value: "10"
+            - name: EN_HTTP_PORT
+              value: "{{ .Values.rpc.http.port }}"
+            - name: EN_WS_PORT
+              value: "{{ .Values.rpc.ws.port }}"
+            - name: EN_HEALTHCHECK_PORT
+              value: "{{ .Values.healthcheck.port }}"
+            - name: EN_PROMETHEUS_PORT
+              value: "{{ .Values.metrics.port }}"
+            - name: EN_ETH_CLIENT_URL
+              value: "{{ .Values.node.ethClientUrl }}"
+            - name: EN_MAIN_NODE_URL
+              value: "{{ .Values.node.mainnetUrl }}"
+            - name: EN_L1_CHAIN_ID
+              value: "{{ .Values.node.l1ChainId }}"
+            - name: EN_L2_CHAIN_ID
+              value: "{{ .Values.node.l2ChainId }}"
+            - name: EN_STATE_CACHE_PATH
+              value: "./db/ext-node/state_keeper"
+            - name: EN_MERKLE_TREE_PATH
+              value: "./db/ext-node/lightweight"
+            - name: EN_PRUNING_ENABLED
+              value: "{{ .Values.node.pruningEnabled }}"
+            - name: EN_SNAPSHOTS_RECOVERY_ENABLED
+              value: "{{ .Values.node.snapshotRecoveryEnabled }}"
+            - name: EN_SNAPSHOTS_OBJECT_STORE_BUCKET_BASE_URL
+              value: "{{ .Values.node.snapshotBucket }}"
+            - name: EN_SNAPSHOTS_OBJECT_STORE_MODE
+              value: "GCSAnonymousReadOnly"
+            - name: RUST_LOG
+              value: "warn,zksync=info,zksync_web3_decl::client=error"
+            - name: EN_API_NAMESPACES
+              value: "{{ .Values.rpc.api }}"
+          ports:
+          {{- if .Values.rpc.http.enabled }}
+            - name: http
+              containerPort: {{ .Values.rpc.http.port }}
+          {{- end }}
+          {{- if .Values.rpc.ws.enabled }}
+            - name: ws
+              containerPort: {{ .Values.rpc.ws.port }}
+          {{- end }}
+          {{- if .Values.global.metrics.enabled }}
+            - name: metrics
+              containerPort: {{ .Values.metrics.port }}
+          {{- end }}
+          volumeMounts:
+            - name: statekeeper
+              mountPath: /db/ext-node/state_keeper
+            - name: lightweight
+              mountPath: /db/ext-node/lightweight
+        {{- with .Values.resources }}
+          resources:
+            {{ toYaml . | nindent 12 | trim }}
+        {{- end }}
+      {{- if .Values.rpc.http.enabled }}
+        - name: sidecar
+          image: "{{ .Values.sidecar.registry }}/{{ .Values.sidecar.repository }}:{{ .Values.sidecar.tag }}"
+          imagePullPolicy: {{ .Values.sidecar.pullPolicy }}
+          env:
+            - name: SERVER_BINDADDR
+              value: "{{ .Values.sidecar.bindAddr }}:{{ .Values.sidecar.bindPort }}"
+            - name: CLIENT_PORT
+              value: {{ .Values.rpc.http.port | quote }}
+          ports:
+            - containerPort: {{ .Values.sidecar.bindPort }}
+              name: sidecar
+              protocol: TCP
+        {{- if or .Values.global.livenessProbe.enabled .Values.livenessProbe.enabled }}
+          livenessProbe:
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+            successThreshold: {{ .Values.livenessProbe.successThreshold }}
+            httpGet:
+              path: {{ .Values.livenessProbe.httpGet.path }}
+              port: {{ .Values.livenessProbe.httpGet.port }}
+              scheme: {{ .Values.livenessProbe.httpGet.scheme }}
+        {{- end }}
+        {{- if or .Values.global.readinessProbe.enabled .Values.readinessProbe.enabled }}
+          readinessProbe:
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+            successThreshold: {{ .Values.readinessProbe.successThreshold }}
+            httpGet:
+              path: {{ .Values.readinessProbe.httpGet.path }}
+              port: {{ .Values.readinessProbe.httpGet.port }}
+              scheme: {{ .Values.readinessProbe.httpGet.scheme }}
+        {{- end }}
+      {{- end }}
+      volumes:
+{{- if (not .Values.persistence.enabled) }}
+        - name: statekeeper
+          emptyDir: {}
+        - name: lightweight
+          emptyDir: {}
+{{- else }}
+  volumeClaimTemplates:
+    - metadata:
+        name: lightweight
+        labels:
+          {{- include "common.labels.statefulset" . | nindent 10 }}
+      {{- with .Values.persistence.annotations }}
+        annotations:
+          {{ toYaml . | nindent 10 | trim }}
+      {{- end }}
+      spec:
+        accessModes: {{ .Values.persistence.accessModes }}
+        storageClassName: {{ .Values.persistence.storageClassName }}
+        resources:
+          requests:
+            storage: {{ .Values.persistence.size | quote }}
+    - metadata:
+        name: statekeeper
+        labels:
+          {{- include "common.labels.statefulset" . | nindent 10 }}
+      {{- with .Values.persistence.annotations }}
+        annotations:
+          {{ toYaml . | nindent 10 | trim }}
+      {{- end }}
+      spec:
+        accessModes: {{ .Values.persistence.accessModes }}
+        storageClassName: {{ .Values.persistence.storageClassName }}
+        resources:
+          requests:
+            storage: {{ .Values.persistence.size | quote }}
+{{- end }}

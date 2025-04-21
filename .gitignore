@@ -1,0 +1,10 @@
+.idea
+.vscode
+
+# ignore fetched subcharts
+**/charts/**/charts
+
+# ignore testing files
+**/override.yaml
+
+.DS_Store

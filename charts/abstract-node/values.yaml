@@ -1,0 +1,313 @@
+# Default values for abstract-node.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+global:
+  replicaCount: 1
+  ## Credentials to fetch images from private registry
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ##
+  imagePullSecrets: []
+
+  ## Service account
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+  ## Additional settings could be made in non-global section.
+  ##
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+
+  ## RBAC configuration.
+  ## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+  ## Additional settings could be made in non-global section.
+  ##
+  rbac:
+    ## Specifies whether RBAC resources are to be created
+    ##
+    create: true
+
+  ## Monitoring
+  ## Additional settings could be made in non-global section.
+  ##
+  metrics:
+    ## Whether to enable metrics collection or not
+    ##
+    enabled: true
+
+    ## Prometheus Service Monitor
+    ## ref: https://github.com/coreos/prometheus-operator
+    ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+    ##
+    serviceMonitor:
+      ## Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
+      ##
+      enabled: false
+
+    ## Custom PrometheusRule to be defined
+    ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
+    ##
+    prometheusRule:
+      ## Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
+      ##
+      enabled: false
+
+  ## Configure liveness and readiness probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+  ## NB! readinessProbe and livenessProbe must be disabled before fully synced
+  ## Additional settings could be made in non-global section.
+  ##
+  livenessProbe:
+    enabled: true
+
+  readinessProbe:
+    enabled: true
+
+## Sidecar image is used to perform Liveness/Readiness probes.
+##
+sidecar:
+  enabled: true
+  registry: "ghcr.io"
+  repository: "abstract-foundation/zksync-external-node-sidecar"
+  tag: "v1.0.0"
+  pullPolicy: IfNotPresent
+  bindAddr: "0.0.0.0"
+  bindPort: 3000
+
+## External node image version
+##
+image:
+  registry: docker.io
+  repository: matterlabs/external-node
+  pullPolicy: IfNotPresent
+  tag: "26.8.5"
+
+# This is for the secretes for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+imagePullSecrets: []
+## Provide a name in place of abstract-node for `app:` labels
+##
+nameOverride: ""
+
+## Provide a name to substitute for the full names of resources
+##
+fullnameOverride: ""
+
+# This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/
+serviceAccount:
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+## Termination Grace Period
+## ref: https://kubernetes.io/docs/tasks/run-application/force-delete-stateful-set-pod/#delete-pods
+##
+terminationGracePeriodSeconds: 300
+
+## RBAC configuration.
+## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+##
+rbac:
+  # The name of the cluster role to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+  ## Required ClusterRole rules
+  ##
+  clusterRules:
+    ## Required to obtain the nodes external IP
+    ##
+    - apiGroups: [""]
+      resources:
+        - "nodes"
+      verbs:
+        - "get"
+        - "list"
+        - "watch"
+  ## Required Role rules
+  ##
+  rules:
+    ## Required to get information about the serices nodePort.
+    ##
+    - apiGroups: [""]
+      resources:
+        - "services"
+      verbs:
+        - "get"
+        - "list"
+        - "watch"
+
+## Configure pod disruption budgets for Alertmanager
+## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/#specifying-a-poddisruptionbudget
+## This configuration is immutable once created and will require the PDB to be deleted to be changed
+## https://github.com/kubernetes/kubernetes/issues/45398
+##
+podDisruptionBudget:
+  enabled: true
+  maxUnavailable: 1
+
+## Defines whether the service must be headless
+##
+svcHeadless: true
+
+rpc:
+  ## API Namespaces available via RPC
+  ##
+  api: "eth,net,web3,debug,zks,pubsub"
+  ## RPC configuration.
+  ##
+  http:
+    enabled: true
+    port: "3060"
+
+  ## WebSocket configuration.
+  ##
+  ws:
+    enabled: true
+    port: "3061"
+
+## Healthcheck configuration.
+##
+healthcheck:
+  port: "3081"
+
+## Metrics configuration.
+##
+metrics:
+  port: "3322"
+  ## Prometheus Service Monitor
+  ## ref: https://github.com/coreos/prometheus-operator
+  ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+  ##
+  serviceMonitor:
+    ## The namespace in which the ServiceMonitor will be created
+    ##
+    namespace: ""
+    ## The interval at which metrics should be scraped
+    ##
+    interval: 30s
+    ## The timeout after which the scrape is ended
+    ##
+    scrapeTimeout: ""
+    ## Metrics RelabelConfigs to apply to samples before scraping.
+    ##
+    relabellings: []
+    ## Metrics RelabelConfigs to apply to samples before ingestion.
+    ##
+    metricRelabelings: []
+    ## Specify honorLabels parameter to add the scrape endpoint
+    ##
+    honorLabels: false
+    ## Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
+    ##
+    additionalLabels: {}
+  ## Custom PrometheusRule to be defined
+  ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
+  ##
+  prometheusRule:
+    ## Create a default set of Alerts
+    ##
+    default: true
+    ## The namespace in which the prometheusRule will be created
+    ##
+    namespace: ""
+    ## Additional labels for the prometheusRule
+    ##
+    additionalLabels: {}
+    ## Custom Prometheus rules
+    ##
+    rules: []
+
+## Configure resource requests and limits.
+## http://kubernetes.io/docs/user-guide/compute-resources/
+##
+resources: {}
+
+database:
+  secretName: ""
+  secretKey: "uri"
+
+node: 
+  ## The URL of the Ethereum client.
+  ##
+  ethClientUrl: "https://eth.drpc.org"
+  ## The URL of the Mainnet node.
+  ##
+  mainnetUrl: "https://api.mainnet.abs.xyz/"
+  ## The L1 chain ID.
+  ##
+  l1ChainId: "1"
+  ## The L2 chain ID.
+  ##
+  l2ChainId: "2741"
+  pruningEnabled: true
+  snapshotRecoveryEnabled: true
+  snapshotBucket: 'raas-abstract-mainnet-external-node-snapshots'
+
+## Whether or not to allocate persistent volume disk for the rocksdb directories.
+## In case of node failure, the node data directory will still persist.
+##
+persistence:
+  enabled: true
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce
+  size: 10Gi
+  annotations: {}
+
+## Node labels for pod assignment
+## ref: https://kubernetes.io/docs/user-guide/node-selection/
+##
+nodeSelector: {}
+
+## Tolerations for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+##
+tolerations: {}
+
+## Affinity for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+##
+## Example:
+## affinity:
+##   podAntiAffinity:
+##     requiredDuringSchedulingIgnoredDuringExecution:
+##     - labelSelector:
+##         matchExpressions:
+##         - key: app.kubernetes.io/name
+##           operator: In
+##           values:
+##           - reth
+##       topologyKey: kubernetes.io/hostname
+##
+affinity: {}
+
+## used to assign priority to pods
+## ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+##
+priorityClassName: ""
+
+## Configure liveness and readiness probes
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+## NB! readinessProbe and livenessProbe must be disabled before fully synced
+##
+livenessProbe:
+  initialDelaySeconds: 900
+  timeoutSeconds: 3
+  periodSeconds: 30
+  failureThreshold: 3
+  successThreshold: 1
+  httpGet:
+    path: /en/liveness
+    port: sidecar
+    scheme: HTTP
+
+readinessProbe:
+  initialDelaySeconds: 30
+  timeoutSeconds: 3
+  periodSeconds: 30
+  failureThreshold: 30
+  successThreshold: 1
+  httpGet:
+    path: /en/readiness
+    port: sidecar
+    scheme: HTTP
