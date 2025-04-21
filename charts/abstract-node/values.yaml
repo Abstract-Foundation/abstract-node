@@ -79,7 +79,7 @@ image:
   registry: docker.io
   repository: matterlabs/external-node
   pullPolicy: IfNotPresent
-  tag: "26.8.5"
+  tag: "v26.8.5"
 
 # This is for the secretes for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []
@@ -311,3 +311,15 @@ readinessProbe:
     path: /en/readiness
     port: sidecar
     scheme: HTTP
+
+## For using CNPG (Cloud Native PostgreSQL)
+## If enabled the cluster will be created and the database will be used by the node
+## ref: https://github.com/cloudnative-pg/cloudnative-pg
+##
+cnpg:
+  enabled: false
+  instances: 1
+  affinity: {}
+  storageClass: ""
+  storageSize: 250Gi
+  enablePodMonitor: true

@@ -1,3 +1,5 @@
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/abstract-node)](https://artifacthub.io/packages/search?repo=abstract-node)
+
 # Abstract External Node:
 
 This repository provides resources for deploying and managing nodes on the Abstract network. It includes configurations and scripts to facilitate the setup of both external nodes and associated services. 

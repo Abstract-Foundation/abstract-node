@@ -58,8 +58,8 @@ spec:
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
-                  name: "${{ .Values.database.secretName }}"
-                  key: ${{ .Values.database.secretKey }}
+                  name: {{ .Values.database.secretName }}
+                  key: {{ .Values.database.secretKey }}
                   optional: false
             - name: EN_GAS_PRICE_SCALE_FACTOR
               value: "1.5"
@@ -90,17 +90,17 @@ spec:
             - name: EN_MERKLE_TREE_PATH
               value: "./db/ext-node/lightweight"
             - name: EN_PRUNING_ENABLED
-              value: "${{ .Values.node.pruningEnabled }}"
+              value: "{{ .Values.node.pruningEnabled }}"
             - name: EN_SNAPSHOTS_RECOVERY_ENABLED
-              value: "${{ .Values.node.snapshotRecoveryEnabled }}"
+              value: "{{ .Values.node.snapshotRecoveryEnabled }}"
             - name: EN_SNAPSHOTS_OBJECT_STORE_BUCKET_BASE_URL
-              value: "${{ .Values.node.snapshotBucket }}"
+              value: "{{ .Values.node.snapshotBucket }}"
             - name: EN_SNAPSHOTS_OBJECT_STORE_MODE
               value: "GCSAnonymousReadOnly"
             - name: RUST_LOG
               value: "warn,zksync=info,zksync_web3_decl::client=error"
             - name: EN_API_NAMESPACES
-              value: "${{ .Values.rpc.api }}"
+              value: "{{ .Values.rpc.api }}"
           ports:
           {{- if .Values.rpc.http.enabled }}
             - name: http
