@@ -10,7 +10,7 @@ spec:
   affinity:
     {{ toYaml . | nindent 8 | trim }}
 {{- end }}
-  instances: {{ Values.cnpg.instances }}
+  instances: {{ .Values.cnpg.instances }}
   storage:
     storageClass: {{ .Values.cnpg.storageClass }}
     size: {{ .Values.cnpg.storageSize }}
