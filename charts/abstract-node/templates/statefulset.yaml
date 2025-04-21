@@ -70,37 +70,37 @@ spec:
             - name: DATABASE_POOL_SIZE
               value: "10"
             - name: EN_HTTP_PORT
-              value: {{ .Values.rpc.http.port }}
+              value: "{{ .Values.rpc.http.port }}"
             - name: EN_WS_PORT
-              value: {{ .Values.rpc.ws.port }}
+              value: "{{ .Values.rpc.ws.port }}"
             - name: EN_HEALTHCHECK_PORT
-              value: {{ .Values.healthcheck.port }}
+              value: "{{ .Values.healthcheck.port }}"
             - name: EN_PROMETHEUS_PORT
-              value: {{ .Values.metrics.port }}
+              value: "{{ .Values.metrics.port }}"
             - name: EN_ETH_CLIENT_URL
-              value: {{ .Values.node.ethClientUrl }}
+              value: "{{ .Values.node.ethClientUrl }}"
             - name: EN_MAIN_NODE_URL
-              value: {{ .Values.node.mainnetUrl }}
+              value: "{{ .Values.node.mainnetUrl }}"
             - name: EN_L1_CHAIN_ID
-              value: {{ .Values.node.l1ChainId }}
+              value: "{{ .Values.node.l1ChainId }}"
             - name: EN_L2_CHAIN_ID
-              value: {{ .Values.node.l2ChainId }}
+              value: "{{ .Values.node.l2ChainId }}"
             - name: EN_STATE_CACHE_PATH
               value: "./db/ext-node/state_keeper"
             - name: EN_MERKLE_TREE_PATH
               value: "./db/ext-node/lightweight"
             - name: EN_PRUNING_ENABLED
-              value: {{ .Values.node.pruningEnabled }}
+              value: "{{ .Values.node.pruningEnabled }}"
             - name: EN_SNAPSHOTS_RECOVERY_ENABLED
-              value: {{ .Values.node.snapshotRecoveryEnabled }}
+              value: "{{ .Values.node.snapshotRecoveryEnabled }}"
             - name: EN_SNAPSHOTS_OBJECT_STORE_BUCKET_BASE_URL
-              value: {{ .Values.node.snapshotBucket }}
+              value: "{{ .Values.node.snapshotBucket }}"
             - name: EN_SNAPSHOTS_OBJECT_STORE_MODE
               value: "GCSAnonymousReadOnly"
             - name: RUST_LOG
               value: "warn,zksync=info,zksync_web3_decl::client=error"
             - name: EN_API_NAMESPACES
-              value: {{ .Values.rpc.api }}
+              value: "{{ .Values.rpc.api }}"
           ports:
           {{- if .Values.rpc.http.enabled }}
             - name: http
