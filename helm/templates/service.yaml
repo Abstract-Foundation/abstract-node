@@ -1,0 +1,32 @@
+{{- if or .Values.rpc.http.enabled .Values.rpc.ws.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+spec:
+{{- if .Values.svcHeadless }}
+  clusterIP: None
+{{- end }}
+  type: ClusterIP
+  ports:
+  {{- if .Values.rpc.http.enabled }}
+    - name: http
+      port: {{ .Values.rpc.http.port }}
+      targetPort: http
+  {{- end }}
+  {{- if .Values.rpc.ws.enabled }}
+    - name: ws
+      port: {{ .Values.rpc.ws.port }}
+      targetPort: ws
+  {{- end }}
+  {{- if .Values.global.metrics.enabled }}
+    - name: metrics
+      port: {{ .Values.metrics.port }}
+      targetPort: metrics
+  {{- end }}
+  selector:
+    {{- include "common.labels.matchLabels" . | nindent 4 }}
+{{- end }}
