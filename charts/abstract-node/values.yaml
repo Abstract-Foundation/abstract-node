@@ -226,7 +226,7 @@ database:
   secretName: ""
   secretKey: "uri"
 
-node: 
+node:
   ## The URL of the Ethereum client.
   ##
   ethClientUrl: "https://eth.drpc.org"
@@ -251,8 +251,11 @@ persistence:
   storageClassName: ""
   accessModes:
     - ReadWriteOnce
-  size: 10Gi
   annotations: {}
+  lightweight:
+    size: 10Gi
+  statekeeper:
+    size: 10Gi
 
 ## Node labels for pod assignment
 ## ref: https://kubernetes.io/docs/user-guide/node-selection/
