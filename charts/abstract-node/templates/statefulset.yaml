@@ -182,7 +182,7 @@ spec:
         storageClassName: {{ .Values.persistence.storageClassName }}
         resources:
           requests:
-            storage: {{ .Values.persistence.size | quote }}
+            storage: {{ .Values.persistence.lightweight.size | quote }}
     - metadata:
         name: statekeeper
         labels:
@@ -196,5 +196,5 @@ spec:
         storageClassName: {{ .Values.persistence.storageClassName }}
         resources:
           requests:
-            storage: {{ .Values.persistence.size | quote }}
+            storage: {{ .Values.persistence.statekeeper.size | quote }}
 {{- end }}
