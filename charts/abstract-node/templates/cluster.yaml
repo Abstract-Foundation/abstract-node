@@ -2,7 +2,7 @@
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
-  name: {{- include "common.names.fullname" . -}}{{- if .Values.cnpg.clusterSuffix -}}-{{- .Values.cnpg.clusterSuffix -}}{{- end -}}
+  name: {{- include "common.names.fullname" . -}}{{- if .Values.cnpg.clusterSuffix -}}-{{- .Values.cnpg.clusterSuffix -}}{{- end }}
   labels:
     {{- include "common.labels.standard" . | nindent 4 }}
 spec:
