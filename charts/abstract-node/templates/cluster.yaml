@@ -2,7 +2,7 @@
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
-  name: {{ printf "%s-%s" (include "common.names.fullname" .) .Values.cnpg.clusterSuffix | trunc 63 | trimSuffix "-" -}}
+  name: {{- printf "%s-%s" (include "common.names.fullname" .) .Values.cnpg.clusterSuffix | trunc 63 | trimSuffix "-" -}}
   labels:
     {{- include "common.labels.standard" . | nindent 4 }}
 spec:
