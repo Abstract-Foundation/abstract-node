@@ -64,12 +64,12 @@ spec:
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.database.secretName }}
                   {{- if .Values.cnpg.enabled }}
-                  key: {{ printf "%s-%s" (include "common.names.fullname" .) .Values.cnpg.clusterSuffix | trunc 63 | trimSuffix "-" }}-app
+                  name: {{ printf "%s-%s" (include "common.names.fullname" .) .Values.cnpg.clusterSuffix | trunc 63 | trimSuffix "-" }}-app
                   {{- else }}
-                  key: {{ .Values.database.secretKey }}
+                  name: {{ .Values.database.secretName }}
                   {{- end }}
+                  key: {{ .Values.database.secretKey }}
                   optional: false
             - name: EN_GAS_PRICE_SCALE_FACTOR
               value: "1.5"
