@@ -27,6 +27,11 @@ spec:
       port: {{ .Values.metrics.port }}
       targetPort: metrics
   {{- end }}
+  {{- if .Values.healthcheck.enabled }}
+    - name: healthcheck
+      port: {{ .Values.healthcheck.port }}
+      targetPort: healthcheck
+  {{- end }}
   selector:
     {{- include "common.labels.matchLabels" . | nindent 4 }}
 {{- end }}
