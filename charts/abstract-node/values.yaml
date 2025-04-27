@@ -323,6 +323,7 @@ cnpg:
   enabled: false
   instances: 1
   affinity: {}
+  clusterSuffix: postgres
   storageClass: ""
   storageSize: 250Gi
   enablePodMonitor: true
