@@ -328,3 +328,17 @@ cnpg:
   storageClass: ""
   storageSize: 250Gi
   enablePodMonitor: true
+  backup: {}
+  bootstrap: {}
+  externalClusters: {}
+  postgresql:
+    parameters:
+      shared_buffers: 2GB
+      min_wal_size: 4GB
+      max_wal_size: 16GB
+      max_connections: "200"
+      maintenance_work_mem: 1GB
+      checkpoint_completion_target: "0.9"
+      random_page_cost: "1.1"
+      effective_io_concurrency: "200"
+      max_worker_processes: "16"

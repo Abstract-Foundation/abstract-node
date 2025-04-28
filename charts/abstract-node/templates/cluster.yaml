@@ -6,8 +6,24 @@ metadata:
   labels:
     {{- include "common.labels.standard" . | nindent 4 }}
 spec:
-{{- with .Values.affinity }}
+{{- with .Values.cnpg.postgresql }}
+  postgresql:
+    {{ toYaml . | nindent 8 | trim }}
+{{- end }}
+{{- with .Values.cnpg.affinity }}
   affinity:
+    {{ toYaml . | nindent 8 | trim }}
+{{- end }}
+{{- with .Values.cnpg.backup }}
+  backup:
+    {{ toYaml . | nindent 8 | trim }}
+{{- end }}
+{{- with .Values.cnpg.bootstrap }}
+  bootstrap:
+    {{ toYaml . | nindent 8 | trim }}
+{{- end }}
+{{- with .Values.cnpg.externalClusters }}
+  externalClusters:
     {{ toYaml . | nindent 8 | trim }}
 {{- end }}
   instances: {{ .Values.cnpg.instances }}

@@ -1,7 +1,7 @@
 apiVersion: v2
 name: abstract-node
 description: External node for syncing and serving blockchain data for Abstract
-version: 0.1.22
+version: 0.1.23
 type: application
 icon: https://abstract-assets.abs.xyz/icons/light.png
 keywords:
