@@ -168,6 +168,7 @@ rpc:
 ## Healthcheck configuration.
 ##
 healthcheck:
+  enabled: true
   port: "3081"
 
 ## Metrics configuration.
