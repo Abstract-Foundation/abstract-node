@@ -143,6 +143,10 @@ spec:
             - name: EN_DA_SECRETS_SEED_PHRASE
               value: {{ .Values.node.daSecretsSeedPhrase | quote }}
             {{- end }}
+            {{- if .Values.node.experimentalSnapshotsRecoveryL1Batch }}
+            - name: EN_EXPERIMENTAL_SNAPSHOTS_RECOVERY_L1_BATCH
+              value: {{ .Values.node.experimentalSnapshotsRecoveryL1Batch | quote }}
+            {{- end }}
           ports:
           {{- if .Values.rpc.http.enabled }}
             - name: http
