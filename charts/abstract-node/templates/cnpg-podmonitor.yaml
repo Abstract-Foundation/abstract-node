@@ -2,11 +2,9 @@
 apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
 metadata:
-  metadata:
-  name: {{ include "common.names.fullname" . }}
+  name: {{ include "cnpg.clusterName" . }}
   labels:
     {{- include "common.labels.standard" . | nindent 4 }}
-  labels:
     cnpg.io/cluster: {{ include "cnpg.clusterName" . }}
     {{- if .Values.metrics.serviceMonitor.additionalLabels }}
     {{- toYaml .Values.metrics.serviceMonitor.additionalLabels | nindent 4 }}
