@@ -7,14 +7,14 @@ metadata:
   labels:
     {{- include "common.labels.standard" . | nindent 4 }}
   labels:
-    cnpg.io/cluster: {{- include "cnpg.clusterName" }}
+    cnpg.io/cluster: {{- include "cnpg.clusterName" . }}
     {{- if .Values.metrics.serviceMonitor.additionalLabels }}
     {{- toYaml .Values.metrics.serviceMonitor.additionalLabels | nindent 4 }}
     {{- end }}
 spec:
   selector:
     matchLabels:
-      cnpg.io/cluster: {{- include "cnpg.clusterName" }}
+      cnpg.io/cluster: {{- include "cnpg.clusterName" . }}
   podMetricsEndpoints:
   - port: metrics
 {{- end }}
