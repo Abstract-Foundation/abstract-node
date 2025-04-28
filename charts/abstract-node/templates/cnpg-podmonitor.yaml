@@ -1,0 +1,20 @@
+{{- if and .Values.cnpg.enabled .Values.cnpg.enablePodMonitor }}
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  metadata:
+  name: {{ include "common.names.fullname" . }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+  labels:
+    cnpg.io/cluster: {{- include "cnpg.clusterName" }}
+    {{- if .Values.metrics.serviceMonitor.additionalLabels }}
+    {{- toYaml .Values.metrics.serviceMonitor.additionalLabels | nindent 4 }}
+    {{- end }}
+spec:
+  selector:
+    matchLabels:
+      cnpg.io/cluster: {{- include "cnpg.clusterName" }}
+  podMetricsEndpoints:
+  - port: metrics
+{{- end }}

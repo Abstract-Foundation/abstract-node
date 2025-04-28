@@ -65,7 +65,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   {{- if .Values.cnpg.enabled }}
-                  name: {{ printf "%s-%s" (include "common.names.fullname" .) .Values.cnpg.clusterSuffix | trunc 63 | trimSuffix "-" }}-app
+                  name: {{ include "cnpg.clusterName" . }}-app
                   {{- else }}
                   name: {{ .Values.database.secretName }}
                   {{- end }}
