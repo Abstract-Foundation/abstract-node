@@ -22,9 +22,8 @@ spec:
   bootstrap:
     {{ toYaml . | nindent 8 | trim }}
 {{- end }}
-{{- with .Values.cnpg.externalClusters }}
-  externalClusters:
-    {{ toYaml . | nindent 8 | trim }}
+{{- if .Values.cnpg.externalClusters }}
+  externalClusters: {{- toYaml .Values.cnpg.externalClusters | nindent 8 }}
 {{- end }}
   instances: {{ .Values.cnpg.instances }}
   storage:

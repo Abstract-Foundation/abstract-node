@@ -330,7 +330,7 @@ cnpg:
   enablePodMonitor: true
   backup: {}
   bootstrap: {}
-  externalClusters: {}
+  externalClusters: []
   postgresql:
     parameters:
       shared_buffers: 2GB
