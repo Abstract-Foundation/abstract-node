@@ -50,7 +50,7 @@ services:
       - POSTGRES_PASSWORD=${DB_PASSWORD:-notsecurepassword}
       - PGPORT=5430
   external-node:
-    image: "matterlabs/external-node:${EN_VERSION:-v27.2.0}"
+    image: "matterlabs/external-node:${EN_VERSION:-v27.5.7}"
     entrypoint: ["/usr/bin/entrypoint.sh"]
     restart: always
     depends_on:
