@@ -165,6 +165,19 @@ rpc:
     enabled: true
     port: "3061"
 
+consensus:
+  port: "3054"
+  publicAddress: "127.0.0.1"
+  debugPagePort: "5000"
+  maxPayloadSize: '5000000'
+  gossipDynamicInboundLimit: '100'
+  gossipStaticOutbound:
+    # preconfigured ENs that you can connect to
+    - key: 'node:public:ed25519:4a94067664e7b8d0927ab1443491dab71a1d0c63f861099e1852f2b6d0831c3e'
+      addr: 'external-node-consensus-sepolia.zksync.dev:3054'
+    - key: 'node:public:ed25519:cfbbebc74127099680584f07a051a2573e2dd7463abdd000d31aaa44a7985045'
+      addr: 'external-node-moby-consensus-sepolia.zksync.dev:3054'
+
 ## Healthcheck configuration.
 ##
 healthcheck:
@@ -253,10 +266,13 @@ persistence:
   accessModes:
     - ReadWriteOnce
   annotations: {}
+  consensus:
+    size: 1Mi
   lightweight:
     size: 10Gi
   statekeeper:
     size: 10Gi
+  
 
 ## Node labels for pod assignment
 ## ref: https://kubernetes.io/docs/user-guide/node-selection/

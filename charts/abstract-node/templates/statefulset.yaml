@@ -46,6 +46,23 @@ spec:
     {{- end }}
       serviceAccountName: {{ include "common.names.serviceAccountName" . }}
       priorityClassName: {{ .Values.priorityClassName | quote }}
+      initContainers:
+      - name: init-consensus-secrets
+        image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command:
+        - "/bin/sh"
+        - "-c"
+        - >
+         if [ ! -f /consensus/secrets.yaml ]; then
+           /usr/bin/zksync_external_node generate-secrets > /consensus/secrets.yaml && 
+           echo 'Created secrets'
+         else
+           echo 'Secrets already exist'
+         fi
+        volumeMounts:
+        - name: consensus-secrets
+          mountPath: /consensus
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
@@ -147,6 +164,10 @@ spec:
             - name: EN_EXPERIMENTAL_SNAPSHOTS_RECOVERY_L1_BATCH
               value: {{ .Values.node.experimentalSnapshotsRecoveryL1Batch | quote }}
             {{- end }}
+            - name: EN_CONSENSUS_CONFIG_PATH
+              value: "/consensus/config.yaml"
+            - name: EN_CONSENSUS_SECRETS_PATH
+              value: "/consensus/secrets.yaml"
           ports:
           {{- if .Values.rpc.http.enabled }}
             - name: http
@@ -164,11 +185,20 @@ spec:
             - name: healthcheck
               containerPort: {{ .Values.healthcheck.port }}
           {{- end }}
+            - name: consensus
+              containerPort: {{ .Values.consensus.port }}
+            - name: debug-page
+              containerPort: {{ .Values.consensus.debugPagePort }}
           volumeMounts:
             - name: statekeeper
               mountPath: /db/ext-node/state_keeper
             - name: lightweight
               mountPath: /db/ext-node/lightweight
+            - name: consensus-secrets
+              mountPath: /consensus
+            - name: consensus-config
+              mountPath: /consensus/config.yaml
+              subPath: config.yaml
         {{- with .Values.resources }}
           resources:
             {{ toYaml . | nindent 12 | trim }}
@@ -217,8 +247,24 @@ spec:
           emptyDir: {}
         - name: lightweight
           emptyDir: {}
+        - name: consensus-secrets
+          emptyDir: {}
 {{- else }}
   volumeClaimTemplates:
+    - metadata:
+        name: consensus-secrets
+        labels:
+          {{- include "common.labels.statefulset" . | nindent 10 }}
+      {{- with .Values.persistence.annotations }}
+        annotations:
+          {{ toYaml . | nindent 10 | trim }}
+      {{- end }}
+      spec:
+        accessModes: {{ .Values.persistence.accessModes }}
+        storageClassName: {{ .Values.persistence.storageClassName }}
+        resources:
+          requests:
+            storage: {{ .Values.persistence.consensus.size | quote }}
     - metadata:
         name: lightweight
         labels:
