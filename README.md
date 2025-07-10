@@ -14,10 +14,20 @@ Override the appropriate env file (`.env.testnet` or `.env.mainnet`) with any va
 ### Mainnet
 ```sh
 cd docker
+./run.sh mainnet up
+```
+or
+```sh
+cd docker
 docker compose --env-file .env.mainnet -f external-node.yml up -d
 ```
 
 ### Testnet
+```sh
+cd docker
+./run.sh testnet up
+```
+or
 ```sh
 cd docker
 docker compose --env-file .env.testnet -f external-node.yml up -d
