@@ -11,5 +11,3 @@ data:
     debug_page_addr: '0.0.0.0:{{ .Values.consensus.debugPagePort }}'
     max_payload_size: {{ .Values.consensus.maxPayloadSize }}
     gossip_dynamic_inbound_limit: {{ .Values.consensus.gossipDynamicInboundLimit }}
-    gossip_static_outbound:
-      {{- toYaml .Values.consensus.gossipStaticOutbound | nindent 12 }}
