@@ -61,7 +61,7 @@ services:
     volumes:
       - ./configs:/configs
     environment:
-      RUST_LOG: error
+      RUST_LOG: "error"
   external-node:
     image: "matterlabs/external-node:${EN_VERSION:-v28.8.0-alpha}"
     entrypoint: ["/usr/bin/entrypoint.sh"]
