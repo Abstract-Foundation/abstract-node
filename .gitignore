@@ -1,6 +1,8 @@
 .idea
 .vscode
 
+consensus_secrets.yaml
+
 # ignore fetched subcharts
 **/charts/**/charts
 

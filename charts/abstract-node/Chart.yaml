@@ -1,7 +1,7 @@
 apiVersion: v2
 name: abstract-node
 description: External node for syncing and serving blockchain data for Abstract
-version: 0.1.27
+version: 0.1.28
 type: application
 icon: https://abstract-assets.abs.xyz/icons/light.png
 keywords:
@@ -11,7 +11,7 @@ keywords:
 home: https://abs.xyz
 sources:
   - https://github.com/matter-labs/zksync-era
-appVersion: "28.6.0"
+appVersion: "28.8.0"
 
 dependencies:
   - name: common
