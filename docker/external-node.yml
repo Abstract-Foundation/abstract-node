@@ -52,7 +52,7 @@ services:
   # Generation of consensus secrets.
   # The secrets are generated iff the secrets file doesn't already exist.
   generate-secrets:
-    image: "matterlabs/external-node:${EN_VERSION:-v28.8.0-alpha}"
+    image: "matterlabs/external-node:${EN_VERSION:-v29.0.0-alpha}"
     entrypoint:
       [
       "/configs/generate_secrets.sh",
@@ -61,7 +61,7 @@ services:
     volumes:
       - ./configs:/configs
   external-node:
-    image: "matterlabs/external-node:${EN_VERSION:-v28.8.0-alpha}"
+    image: "matterlabs/external-node:${EN_VERSION:-v29.0.0-alpha}"
     entrypoint: ["/usr/bin/entrypoint.sh"]
     restart: always
     depends_on:
@@ -105,8 +105,9 @@ services:
       EN_SNAPSHOTS_OBJECT_STORE_BUCKET_BASE_URL: ${EN_SNAPSHOTS_OBJECT_STORE_BUCKET_BASE_URL:-raas-abstract-mainnet-external-node-snapshots}
       EN_SNAPSHOTS_OBJECT_STORE_MODE: "GCSAnonymousReadOnly"
       RUST_LOG: ${RUST_LOG:-warn,zksync=info,zksync_core::metadata_calculator=debug,zksync_state=debug,zksync_utils=debug,zksync_web3_decl::client=error}
-      EN_CONSENSUS_CONFIG_PATH: "/configs/consensus_config.yaml"
-      EN_CONSENSUS_SECRETS_PATH: "/configs/consensus_secrets.yaml"
+      # Consensus is currently disabled for Abstract
+      #EN_CONSENSUS_CONFIG_PATH: "/configs/consensus_config.yaml"
+      #EN_CONSENSUS_SECRETS_PATH: "/configs/consensus_secrets.yaml"
 
 volumes:
   postgres: {}

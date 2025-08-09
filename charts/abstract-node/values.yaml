@@ -79,7 +79,7 @@ image:
   registry: docker.io
   repository: matterlabs/external-node
   pullPolicy: IfNotPresent
-  tag: "v28.6.0"
+  tag: "v29.0.0-alpha"
 
 # This is for the secretes for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []
@@ -166,6 +166,7 @@ rpc:
     port: "3061"
 
 consensus:
+  enabled: false
   port: "3054"
   publicAddress: "127.0.0.1"
   debugPagePort: "5000"
