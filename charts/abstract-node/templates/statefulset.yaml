@@ -46,7 +46,7 @@ spec:
     {{- end }}
       serviceAccountName: {{ include "common.names.serviceAccountName" . }}
       priorityClassName: {{ .Values.priorityClassName | quote }}
-      {{- if .Values.node.consensus.enabled }}
+      {{- if .Values.consensus.enabled }}
       initContainers:
       - name: init-consensus-secrets
         image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
@@ -166,7 +166,7 @@ spec:
             - name: EN_EXPERIMENTAL_SNAPSHOTS_RECOVERY_L1_BATCH
               value: {{ .Values.node.experimentalSnapshotsRecoveryL1Batch | quote }}
             {{- end }}
-            {{- if .Values.node.consensus.enabled }}
+            {{- if .Values.consensus.enabled }}
             - name: EN_CONSENSUS_CONFIG_PATH
               value: "/consensus/config.yaml"
             - name: EN_CONSENSUS_SECRETS_PATH
@@ -189,7 +189,7 @@ spec:
             - name: healthcheck
               containerPort: {{ .Values.healthcheck.port }}
           {{- end }}
-          {{- if .Values.node.consensus.enabled }}
+          {{- if .Values.consensus.enabled }}
             - name: consensus
               containerPort: {{ .Values.consensus.port }}
             - name: debug-page
@@ -200,7 +200,7 @@ spec:
               mountPath: /db/ext-node/state_keeper
             - name: lightweight
               mountPath: /db/ext-node/lightweight
-            {{- if .Values.node.consensus.enabled }}
+            {{- if .Values.consensus.enabled }}
             - name: consensus-secrets
               mountPath: /consensus
             - name: consensus-config
@@ -255,13 +255,13 @@ spec:
           emptyDir: {}
         - name: lightweight
           emptyDir: {}
-        {{- if .Values.node.consensus.enabled }}
+        {{- if .Values.consensus.enabled }}
         - name: consensus-secrets
           emptyDir: {}
         {{- end }}
 {{- else }}
   volumeClaimTemplates:
-    {{- if .Values.node.consensus.enabled }}
+    {{- if .Values.consensus.enabled }}
     - metadata:
         name: consensus-secrets
         labels:
