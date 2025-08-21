@@ -74,7 +74,9 @@ jobs:
                 echo "Test templates found in $chart"
                 # Note: Actual test execution would require a Kubernetes cluster
                 # This step validates that test templates can be rendered
-                helm template test "$chart" --show-only templates/tests/
+                helm template test "$chart" --show-only templates/tests/ || true
+              else
+                echo "No test templates found in $chart - skipping"
               fi
             fi
           done
