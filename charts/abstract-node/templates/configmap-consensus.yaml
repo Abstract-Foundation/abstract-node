@@ -1,3 +1,4 @@
+{{- if or .Values.consensus.enabled -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -11,3 +12,4 @@ data:
     debug_page_addr: '0.0.0.0:{{ .Values.consensus.debugPagePort }}'
     max_payload_size: {{ .Values.consensus.maxPayloadSize }}
     gossip_dynamic_inbound_limit: {{ .Values.consensus.gossipDynamicInboundLimit }}
+{{- end }}
