@@ -218,8 +218,14 @@ spec:
           env:
             - name: SERVER_BINDADDR
               value: "{{ .Values.sidecar.bindAddr }}:{{ .Values.sidecar.bindPort }}"
-            - name: CLIENT_PORT
+            - name: CLIENT_RPCPORT
               value: {{ .Values.rpc.http.port | quote }}
+            - name: CLIENT_HEALTHPORT
+              value: {{ .Values.healthcheck.port | quote }}
+            - name: CLIENT_SCHEME
+              value: "http"
+            - name: CLIENT_HOST
+              value: "127.0.0.1"
           ports:
             - containerPort: {{ .Values.sidecar.bindPort }}
               name: sidecar
