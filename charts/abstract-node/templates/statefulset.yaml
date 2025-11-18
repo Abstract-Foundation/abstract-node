@@ -180,7 +180,7 @@ spec:
             - name: EN_API_SEND_RAW_TX_SYNC_MAX_TIMEOUT_MS
               value: {{ .Values.rpc.sendRawTxSyncMaxTimeout | quote }}
             {{- end }}
-            {{- if .Values.rpc.sendRawTxSyncMinTimeout }}
+            {{- if .Values.rpc.sendRawTxSyncDefaultTimeout }}
             - name: EN_API_SEND_RAW_TX_SYNC_DEFAULT_TIMEOUT_MS
               value: {{ .Values.rpc.sendRawTxSyncDefaultTimeout | quote }}
             {{- end }}
