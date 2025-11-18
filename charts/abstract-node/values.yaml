@@ -260,7 +260,7 @@ node:
   snapshotRecoveryEnabled: true
   snapshotBucket: 'raas-abstract-mainnet-external-node-snapshots'
   statekeeper:
-    l2BlockCommitDeadline: 200
+    l2BlockCommitDeadline: "200 ms"
 
 ## Whether or not to allocate persistent volume disk for the rocksdb directories.
 ## In case of node failure, the node data directory will still persist.
