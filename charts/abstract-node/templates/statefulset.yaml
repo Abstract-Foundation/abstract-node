@@ -172,6 +172,18 @@ spec:
             - name: EN_CONSENSUS_SECRETS_PATH
               value: "/consensus/secrets.yaml"
             {{- end }}
+            {{- if .Values.node.statekeeper.l2BlockCommitDeadline }}
+            - name: EN_STATE_KEEPER_L2_BLOCK_COMMIT_DEADLINE
+              value: {{ .Values.node.statekeeper.l2BlockCommitDeadline | quote }}
+            {{- end }}
+            {{- if .Values.rpc.sendRawTxSyncMaxTimeout }}
+            - name: EN_API_SEND_RAW_TX_SYNC_MAX_TIMEOUT_MS
+              value: {{ .Values.rpc.sendRawTxSyncMaxTimeout | quote }}
+            {{- end }}
+            {{- if .Values.rpc.sendRawTxSyncDefaultTimeout }}
+            - name: EN_API_SEND_RAW_TX_SYNC_DEFAULT_TIMEOUT_MS
+              value: {{ .Values.rpc.sendRawTxSyncDefaultTimeout | quote }}
+            {{- end }}
           ports:
           {{- if .Values.rpc.http.enabled }}
             - name: http

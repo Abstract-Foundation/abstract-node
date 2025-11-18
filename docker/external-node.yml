@@ -109,6 +109,11 @@ services:
       # Consensus is currently disabled for Abstract
       #EN_CONSENSUS_CONFIG_PATH: "/configs/consensus_config.yaml"
       #EN_CONSENSUS_SECRETS_PATH: "/configs/consensus_secrets.yaml"
+      # Statekeeper config for block times
+      EN_STATE_KEEPER_L2_BLOCK_COMMIT_DEADLINE: ${EN_STATE_KEEPER_L2_BLOCK_COMMIT_DEADLINE:-200}
+      # API configuration for eth_sendRawTransactionSync timeouts
+      EN_API_SEND_RAW_TX_SYNC_DEFAULT_TIMEOUT_MS: ${EN_API_SEND_RAW_TX_SYNC_DEFAULT_TIMEOUT_MS:-2000}
+      EN_API_SEND_RAW_TX_SYNC_MAX_TIMEOUT_MS: ${EN_API_SEND_RAW_TX_SYNC_MAX_TIMEOUT_MS:-10000}
 
 volumes:
   postgres: {}
