@@ -81,6 +81,9 @@ image:
   pullPolicy: IfNotPresent
   tag: "v29.14.0"
 
+shutdownWrapper:
+  enabled: false
+
 # This is for the secretes for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []
 ## Provide a name in place of abstract-node for `app:` labels
@@ -153,6 +156,10 @@ rpc:
   ## API Namespaces available via RPC
   ##
   api: "eth,net,web3,debug,zks,pubsub"
+  ##
+  ## Maximum JSON-RPC response body size in MiB.
+  ##
+  maxResponseBodySizeMb: null
   ## RPC configuration.
   ##
   http:
@@ -242,6 +249,8 @@ resources: {}
 database:
   secretName: ""
   secretKey: "uri"
+  poolSize: 10
+  poolSizeMaster: null
 
 node:
   ## The URL of the Ethereum client.

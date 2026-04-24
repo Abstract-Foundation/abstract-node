@@ -69,7 +69,37 @@ spec:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          {{- if .Values.args }}
+          {{- if .Values.shutdownWrapper.enabled }}
+          command:
+            - /bin/sh
+            - -ec
+          args:
+            - |
+              set -eu
+
+              child=0
+
+              forward_int() {
+                if [ "$child" -ne 0 ]; then
+                  echo "Forwarding SIGINT to child process ${child}"
+                  kill -INT "$child" 2>/dev/null || true
+                fi
+              }
+
+              trap 'forward_int' TERM
+              trap 'forward_int' INT
+
+              /usr/bin/entrypoint.sh "$@" &
+              child=$!
+
+              status=0
+              wait "$child" || status=$?
+              exit "$status"
+            - wrapper
+            {{- range .Values.args }}
+            - {{ . | quote }}
+            {{- end }}
+          {{- else if .Values.args }}
           args:
             {{- range .Values.args }}
             - {{ . | quote }}
@@ -97,7 +127,7 @@ spec:
             - name: EN_ESTIMATE_GAS_ACCEPTABLE_OVERESTIMATION
               value: "5000"
             - name: DATABASE_POOL_SIZE
-              value: "10"
+              value: {{ .Values.database.poolSize | quote }}
             - name: EN_HTTP_PORT
               value: {{ .Values.rpc.http.port | quote }}
             - name: EN_WS_PORT
@@ -130,6 +160,14 @@ spec:
               value: "warn,zksync=info,zksync_web3_decl::client=error"
             - name: EN_API_NAMESPACES
               value: {{ .Values.rpc.api | quote }}
+            {{- if .Values.rpc.maxResponseBodySizeMb }}
+            - name: EN_MAX_RESPONSE_BODY_SIZE_MB
+              value: {{ .Values.rpc.maxResponseBodySizeMb | quote }}
+            {{- end }}
+            {{- if .Values.database.poolSizeMaster }}
+            - name: EN_DATABASE_MAX_CONNECTIONS_MASTER
+              value: {{ .Values.database.poolSizeMaster | quote }}
+            {{- end }}
             {{- if .Values.node.batchCommitDataGeneratorMode }}
             - name: EN_L1_BATCH_COMMIT_DATA_GENERATOR_MODE
               value: {{ .Values.node.batchCommitDataGeneratorMode | quote }}
