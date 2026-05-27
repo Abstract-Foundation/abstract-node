@@ -222,6 +222,10 @@ spec:
             - name: EN_API_SEND_RAW_TX_SYNC_DEFAULT_TIMEOUT_MS
               value: {{ .Values.rpc.sendRawTxSyncDefaultTimeout | quote }}
             {{- end }}
+            {{- range $name, $value := .Values.node.extraEnv }}
+            - name: {{ $name | quote }}
+              value: {{ $value | quote }}
+            {{- end }}
           ports:
           {{- if .Values.rpc.http.enabled }}
             - name: http
