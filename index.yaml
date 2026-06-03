@@ -2,6 +2,28 @@ apiVersion: v1
 entries:
   abstract-node:
   - apiVersion: v2
+    appVersion: 29.19.1
+    created: "2026-06-03T12:39:45.762471825Z"
+    dependencies:
+    - name: common
+      repository: https://charts.stakewise.io/
+      version: 1.x.x
+    description: External node for syncing and serving blockchain data for Abstract
+    digest: af5e5a1678bdb6069600505c325f51186ab592c32329df8ac50ab19e886382c4
+    home: https://abs.xyz
+    icon: https://abstract-assets.abs.xyz/icons/light.png
+    keywords:
+    - abstract
+    - external-node
+    - blockchain
+    name: abstract-node
+    sources:
+    - https://github.com/matter-labs/zksync-era
+    type: application
+    urls:
+    - https://github.com/Abstract-Foundation/abstract-node/releases/download/abstract-node-0.1.39/abstract-node-0.1.39.tgz
+    version: 0.1.39
+  - apiVersion: v2
     appVersion: 29.19.0
     created: "2026-05-27T14:27:25.368865596Z"
     dependencies:
@@ -727,4 +749,4 @@ entries:
     urls:
     - https://github.com/Abstract-Foundation/abstract-node/releases/download/abstract-node-0.1.4/abstract-node-0.1.4.tgz
     version: 0.1.4
-generated: "2026-05-27T14:27:25.369191224Z"
+generated: "2026-06-03T12:39:45.762782583Z"
