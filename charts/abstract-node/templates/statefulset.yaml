@@ -260,7 +260,8 @@ spec:
               mountPath: /consensus/config.yaml
               subPath: config.yaml
             {{- end }}
-        {{- with .Values.resources }}
+        {{- $resources := ternary (default .Values.resources .Values.ha.core.resources) .Values.resources .Values.ha.enabled }}
+        {{- with $resources }}
           resources:
             {{ toYaml . | nindent 12 | trim }}
         {{- end }}

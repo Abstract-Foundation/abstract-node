@@ -102,12 +102,20 @@ ha:
     ##
     components: ""
     extraArgs: []
+    ## Resource requests and limits for the core StatefulSet pod.
+    ## Falls back to top-level resources when empty.
+    ##
+    resources: {}
   api:
     replicaCount: 2
     ## Components for API replicas. Leave empty to use "api".
     ##
     components: ""
     extraArgs: []
+    ## Resource requests and limits for API Deployment pods.
+    ## Falls back to top-level resources when empty.
+    ##
+    resources: {}
     service:
       ## API service defaults to a normal ClusterIP service for load balancing.
       ##
