@@ -1,30 +1,23 @@
+{{- if .Values.ha.enabled }}
 ---
-apiVersion: {{ include "common.capabilities.statefulset.apiVersion" . }}
-kind: StatefulSet
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: {{ ternary (include "abstract-node.haCoreName" .) (include "common.names.fullname" .) .Values.ha.enabled }}
+  name: {{ include "abstract-node.haApiName" . }}
   labels:
-    {{- include "common.labels.statefulset" . | nindent 4 }}
-    {{- if .Values.ha.enabled }}
-    app.kubernetes.io/component: core
-    {{- end }}
+    {{- include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: api
 spec:
-  replicas: {{ ternary 1 .Values.global.replicaCount .Values.ha.enabled }}
-  podManagementPolicy: "Parallel"
+  replicas: {{ .Values.ha.api.replicaCount }}
   selector:
     matchLabels:
       {{- include "common.labels.matchLabels" . | nindent 6 }}
-      {{- if .Values.ha.enabled }}
-      app.kubernetes.io/component: core
-      {{- end }}
-  serviceName: {{ ternary (include "abstract-node.haCoreName" .) (include "common.names.fullname" .) .Values.ha.enabled }}
+      app.kubernetes.io/component: api
   template:
     metadata:
       labels:
         {{- include "common.labels.matchLabels" . | nindent 8 }}
-        {{- if .Values.ha.enabled }}
-        app.kubernetes.io/component: core
-        {{- end }}
+        app.kubernetes.io/component: api
       {{- with .Values.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
@@ -55,35 +48,12 @@ spec:
     {{- end }}
       serviceAccountName: {{ include "common.names.serviceAccountName" . }}
       priorityClassName: {{ .Values.priorityClassName | quote }}
-      {{- if .Values.consensus.enabled }}
-      initContainers:
-      - name: init-consensus-secrets
-        image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
-        command:
-        - "/bin/sh"
-        - "-c"
-        - >
-         if [ ! -f /consensus/secrets.yaml ]; then
-           /usr/bin/zksync_external_node generate-secrets > /consensus/secrets.yaml && 
-           echo 'Created secrets'
-         else
-           echo 'Secrets already exist'
-         fi
-        volumeMounts:
-        - name: consensus-secrets
-          mountPath: /consensus
-      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          {{- if .Values.ha.enabled }}
-          {{- $coreArgs := concat (list (printf "--components=%s" (include "abstract-node.haCoreComponents" .))) .Values.ha.core.extraArgs }}
-{{ include "abstract-node.nodeArgs" (dict "root" . "args" $coreArgs) | nindent 10 }}
-          {{- else }}
-{{ include "abstract-node.nodeArgs" (dict "root" . "args" .Values.args) | nindent 10 }}
-          {{- end }}
+          {{- $apiArgs := concat (list (printf "--components=%s" (include "abstract-node.haApiComponents" .))) .Values.ha.api.extraArgs }}
+{{ include "abstract-node.nodeArgs" (dict "root" . "args" $apiArgs) | nindent 10 }}
           env:
             - name: POD_IP
               valueFrom:
@@ -115,10 +85,6 @@ spec:
               value: {{ .Values.healthcheck.port | quote }}
             - name: EN_PROMETHEUS_PORT
               value: {{ .Values.metrics.port | quote }}
-            {{- if and .Values.ha.enabled .Values.ha.treeApi.enabled }}
-            - name: EN_TREE_API_PORT
-              value: {{ .Values.ha.treeApi.port | quote }}
-            {{- end }}
             - name: EN_ETH_CLIENT_URL
               value: {{ .Values.node.ethClientUrl | quote }}
             - name: EN_MAIN_NODE_URL
@@ -143,6 +109,13 @@ spec:
               value: "warn,zksync=info,zksync_web3_decl::client=error"
             - name: EN_API_NAMESPACES
               value: {{ .Values.rpc.api | quote }}
+            {{- if or .Values.ha.treeApi.enabled .Values.ha.api.treeApiUrl }}
+            {{- $treeApiUrl := default (printf "http://%s:%s" (include "abstract-node.haCoreName" .) (.Values.ha.treeApi.port | toString)) .Values.ha.api.treeApiUrl }}
+            - name: EN_API_TREE_API_REMOTE_URL
+              value: {{ $treeApiUrl | quote }}
+            - name: EN_API_WEB3_JSON_RPC_TREE_API_REQUEST_TIMEOUT_SEC
+              value: {{ .Values.ha.treeApi.requestTimeoutSec | quote }}
+            {{- end }}
             {{- if .Values.rpc.maxResponseBodySizeMb }}
             - name: EN_MAX_RESPONSE_BODY_SIZE_MB
               value: {{ .Values.rpc.maxResponseBodySizeMb | quote }}
@@ -156,7 +129,7 @@ spec:
               value: {{ .Values.node.batchCommitDataGeneratorMode | quote }}
             {{- end }}
             {{- if .Values.node.daClient }}
-            - name: EN_DA_CLIENT  
+            - name: EN_DA_CLIENT
               value: {{ .Values.node.daClient | quote }}
             {{- end }}
             {{- if and .Values.node.daClient .Values.node.daClientType }}
@@ -187,12 +160,6 @@ spec:
             - name: EN_EXPERIMENTAL_SNAPSHOTS_RECOVERY_L1_BATCH
               value: {{ .Values.node.experimentalSnapshotsRecoveryL1Batch | quote }}
             {{- end }}
-            {{- if .Values.consensus.enabled }}
-            - name: EN_CONSENSUS_CONFIG_PATH
-              value: "/consensus/config.yaml"
-            - name: EN_CONSENSUS_SECRETS_PATH
-              value: "/consensus/secrets.yaml"
-            {{- end }}
             {{- if .Values.node.statekeeper.l2BlockCommitDeadline }}
             - name: EN_STATE_KEEPER_L2_BLOCK_COMMIT_DEADLINE
               value: {{ .Values.node.statekeeper.l2BlockCommitDeadline | quote }}
@@ -210,11 +177,11 @@ spec:
               value: {{ $value | quote }}
             {{- end }}
           ports:
-          {{- if and (not .Values.ha.enabled) .Values.rpc.http.enabled }}
+          {{- if .Values.rpc.http.enabled }}
             - name: http
               containerPort: {{ .Values.rpc.http.port }}
           {{- end }}
-          {{- if and (not .Values.ha.enabled) .Values.rpc.ws.enabled }}
+          {{- if .Values.rpc.ws.enabled }}
             - name: ws
               containerPort: {{ .Values.rpc.ws.port }}
           {{- end }}
@@ -226,45 +193,11 @@ spec:
             - name: healthcheck
               containerPort: {{ .Values.healthcheck.port }}
           {{- end }}
-          {{- if and .Values.ha.enabled .Values.ha.treeApi.enabled }}
-            - name: tree-api
-              containerPort: {{ .Values.ha.treeApi.port }}
-          {{- end }}
-          {{- if .Values.consensus.enabled }}
-            - name: consensus
-              containerPort: {{ .Values.consensus.port }}
-            - name: debug-page
-              containerPort: {{ .Values.consensus.debugPagePort }}
-          {{- end }}
-          {{- if and .Values.ha.enabled .Values.healthcheck.enabled (or .Values.global.readinessProbe.enabled .Values.readinessProbe.enabled) }}
-          readinessProbe:
-            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
-            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
-            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
-            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
-            successThreshold: {{ .Values.readinessProbe.successThreshold }}
-            httpGet:
-              path: /health
-              port: healthcheck
-              scheme: HTTP
-          {{- end }}
-          volumeMounts:
-            - name: statekeeper
-              mountPath: /db/ext-node/state_keeper
-            - name: lightweight
-              mountPath: /db/ext-node/lightweight
-            {{- if .Values.consensus.enabled }}
-            - name: consensus-secrets
-              mountPath: /consensus
-            - name: consensus-config
-              mountPath: /consensus/config.yaml
-              subPath: config.yaml
-            {{- end }}
         {{- with .Values.resources }}
           resources:
             {{ toYaml . | nindent 12 | trim }}
         {{- end }}
-      {{- if and (not .Values.ha.enabled) .Values.rpc.http.enabled }}
+      {{- if .Values.rpc.http.enabled }}
         - name: sidecar
           image: "{{ .Values.sidecar.registry }}/{{ .Values.sidecar.repository }}:{{ .Values.sidecar.tag }}"
           imagePullPolicy: {{ .Values.sidecar.pullPolicy }}
@@ -308,60 +241,4 @@ spec:
               scheme: {{ .Values.readinessProbe.httpGet.scheme }}
         {{- end }}
       {{- end }}
-      volumes:
-{{- if (not .Values.persistence.enabled) }}
-        - name: statekeeper
-          emptyDir: {}
-        - name: lightweight
-          emptyDir: {}
-        {{- if .Values.consensus.enabled }}
-        - name: consensus-secrets
-          emptyDir: {}
-        {{- end }}
-{{- else }}
-  volumeClaimTemplates:
-    {{- if .Values.consensus.enabled }}
-    - metadata:
-        name: consensus-secrets
-        labels:
-          {{- include "common.labels.statefulset" . | nindent 10 }}
-      {{- with .Values.persistence.annotations }}
-        annotations:
-          {{ toYaml . | nindent 10 | trim }}
-      {{- end }}
-      spec:
-        accessModes: {{ .Values.persistence.accessModes }}
-        storageClassName: {{ .Values.persistence.storageClassName }}
-        resources:
-          requests:
-            storage: {{ .Values.persistence.consensus.size | quote }}
-    {{- end }}
-    - metadata:
-        name: lightweight
-        labels:
-          {{- include "common.labels.statefulset" . | nindent 10 }}
-      {{- with .Values.persistence.annotations }}
-        annotations:
-          {{ toYaml . | nindent 10 | trim }}
-      {{- end }}
-      spec:
-        accessModes: {{ .Values.persistence.accessModes }}
-        storageClassName: {{ .Values.persistence.storageClassName }}
-        resources:
-          requests:
-            storage: {{ .Values.persistence.lightweight.size | quote }}
-    - metadata:
-        name: statekeeper
-        labels:
-          {{- include "common.labels.statefulset" . | nindent 10 }}
-      {{- with .Values.persistence.annotations }}
-        annotations:
-          {{ toYaml . | nindent 10 | trim }}
-      {{- end }}
-      spec:
-        accessModes: {{ .Values.persistence.accessModes }}
-        storageClassName: {{ .Values.persistence.storageClassName }}
-        resources:
-          requests:
-            storage: {{ .Values.persistence.statekeeper.size | quote }}
 {{- end }}

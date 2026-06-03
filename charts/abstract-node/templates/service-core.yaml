@@ -1,0 +1,40 @@
+{{- if .Values.ha.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "abstract-node.haCoreName" . }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: core
+spec:
+  clusterIP: None
+  type: ClusterIP
+  ports:
+  {{- if .Values.global.metrics.enabled }}
+    - name: metrics
+      port: {{ .Values.metrics.port }}
+      targetPort: metrics
+  {{- end }}
+  {{- if .Values.healthcheck.enabled }}
+    - name: healthcheck
+      port: {{ .Values.healthcheck.port }}
+      targetPort: healthcheck
+  {{- end }}
+  {{- if .Values.ha.treeApi.enabled }}
+    - name: tree-api
+      port: {{ .Values.ha.treeApi.port }}
+      targetPort: tree-api
+  {{- end }}
+  {{- if .Values.consensus.enabled }}
+    - name: consensus
+      port: {{ .Values.consensus.port }}
+      targetPort: consensus
+    - name: debug-page
+      port: {{ .Values.consensus.debugPagePort }}
+      targetPort: debug-page
+  {{- end }}
+  selector:
+    {{- include "common.labels.matchLabels" . | nindent 4 }}
+    app.kubernetes.io/component: core
+{{- end }}

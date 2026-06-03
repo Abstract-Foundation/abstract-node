@@ -6,8 +6,11 @@ metadata:
   name: {{ include "common.names.fullname" . }}
   labels:
     {{- include "common.labels.standard" . | nindent 4 }}
+    {{- if .Values.ha.enabled }}
+    app.kubernetes.io/component: api
+    {{- end }}
 spec:
-{{- if .Values.svcHeadless }}
+{{- if ternary .Values.ha.api.service.headless .Values.svcHeadless .Values.ha.enabled }}
   clusterIP: None
 {{- end }}
   type: ClusterIP
@@ -34,4 +37,7 @@ spec:
   {{- end }}
   selector:
     {{- include "common.labels.matchLabels" . | nindent 4 }}
+    {{- if .Values.ha.enabled }}
+    app.kubernetes.io/component: api
+    {{- end }}
 {{- end }}

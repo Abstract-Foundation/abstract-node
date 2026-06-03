@@ -15,4 +15,7 @@ spec:
   selector:
     matchLabels:
       {{- include "common.labels.matchLabels" . | nindent 6 }}
+      {{- if .Values.ha.enabled }}
+      app.kubernetes.io/component: api
+      {{- end }}
 {{- end }}

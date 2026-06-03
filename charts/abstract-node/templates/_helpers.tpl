@@ -60,3 +60,84 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+HA core StatefulSet / governing service name.
+*/}}
+{{- define "abstract-node.haCoreName" -}}
+{{- $name := include "common.names.fullname" . | trunc 58 | trimSuffix "-" -}}
+{{- printf "%s-core" $name -}}
+{{- end }}
+
+{{/*
+HA API Deployment name.
+*/}}
+{{- define "abstract-node.haApiName" -}}
+{{- $name := include "common.names.fullname" . | trunc 59 | trimSuffix "-" -}}
+{{- printf "%s-api" $name -}}
+{{- end }}
+
+{{/*
+Default HA core components. The tree API is included by default so API replicas can
+proxy proof requests to the singleton tree.
+*/}}
+{{- define "abstract-node.haCoreComponents" -}}
+{{- if .Values.ha.core.components -}}
+{{- .Values.ha.core.components -}}
+{{- else if .Values.ha.treeApi.enabled -}}
+core,tree,tree_fetcher,tree_api
+{{- else -}}
+core,tree,tree_fetcher
+{{- end -}}
+{{- end }}
+
+{{/*
+Default HA API components.
+*/}}
+{{- define "abstract-node.haApiComponents" -}}
+{{- default "api" .Values.ha.api.components -}}
+{{- end }}
+
+{{/*
+Render external node command / args, preserving the existing shutdown wrapper behavior.
+*/}}
+{{- define "abstract-node.nodeArgs" -}}
+{{- $root := .root -}}
+{{- $args := default (list) .args -}}
+{{- if $root.Values.shutdownWrapper.enabled }}
+command:
+  - /bin/sh
+  - -ec
+args:
+  - |
+    set -eu
+
+    child=0
+
+    forward_int() {
+      if [ "$child" -ne 0 ]; then
+        echo "Forwarding SIGINT to child process ${child}"
+        kill -INT "$child" 2>/dev/null || true
+      fi
+    }
+
+    trap 'forward_int' TERM
+    trap 'forward_int' INT
+
+    /usr/bin/entrypoint.sh "$@" &
+    child=$!
+
+    status=0
+    wait "$child" || status=$?
+    exit "$status"
+  - wrapper
+  {{- range $args }}
+  - {{ . | quote }}
+  {{- end }}
+{{- else if $args }}
+args:
+  {{- range $args }}
+  - {{ . | quote }}
+  {{- end }}
+{{- end }}
+{{- end }}
