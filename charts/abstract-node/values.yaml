@@ -84,6 +84,46 @@ image:
 shutdownWrapper:
   enabled: false
 
+## Additional arguments for the single-instance external node container.
+## In HA mode, use ha.core.extraArgs / ha.api.extraArgs instead.
+##
+args: []
+
+## High-availability mode splits the external node into:
+## - one StatefulSet pod running core/tree components with RocksDB persistence
+## - a Deployment running one or more API-only replicas
+##
+ha:
+  enabled: false
+  core:
+    ## Components for the singleton StatefulSet pod. Leave empty to use the
+    ## default, which is core,tree,tree_fetcher,tree_api when ha.treeApi.enabled
+    ## is true, otherwise core,tree,tree_fetcher.
+    ##
+    components: ""
+    extraArgs: []
+  api:
+    replicaCount: 2
+    ## Components for API replicas. Leave empty to use "api".
+    ##
+    components: ""
+    extraArgs: []
+    service:
+      ## API service defaults to a normal ClusterIP service for load balancing.
+      ##
+      headless: false
+    ## Optional override for the remote tree API URL used by API replicas.
+    ## When empty and ha.treeApi.enabled is true, the chart points API replicas
+    ## at the HA core service.
+    ##
+    treeApiUrl: ""
+  treeApi:
+    ## Runs tree_api with the core pod and wires API replicas to it.
+    ##
+    enabled: true
+    port: "3072"
+    requestTimeoutSec: 60
+
 # This is for the secretes for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []
 ## Provide a name in place of abstract-node for `app:` labels
