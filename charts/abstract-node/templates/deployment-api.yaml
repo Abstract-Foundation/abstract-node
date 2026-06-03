@@ -193,7 +193,7 @@ spec:
             - name: healthcheck
               containerPort: {{ .Values.healthcheck.port }}
           {{- end }}
-        {{- with .Values.resources }}
+        {{- with (default .Values.resources .Values.ha.api.resources) }}
           resources:
             {{ toYaml . | nindent 12 | trim }}
         {{- end }}
