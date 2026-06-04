@@ -62,6 +62,28 @@ Create the name of the service account to use
 {{- end }}
 
 {{/*
+Render OpenTelemetry environment variables for the external node container.
+*/}}
+{{- define "abstract-node.otelEnv" -}}
+{{- with .Values.otel }}
+{{- if .enabled }}
+- name: OPENTELEMETRY_LEVEL
+  value: {{ .level | quote }}
+{{- with .endpoint }}
+- name: OTLP_ENDPOINT
+  value: {{ . | quote }}
+{{- end }}
+{{- with .serviceName }}
+- name: SERVICE_NAME
+  value: {{ . | quote }}
+{{- end }}
+- name: EN_EXTENDED_RPC_TRACING
+  value: {{ .extendedRpcTracing | quote }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{/*
 HA core StatefulSet / governing service name.
 */}}
 {{- define "abstract-node.haCoreName" -}}

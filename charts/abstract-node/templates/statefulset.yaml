@@ -215,6 +215,9 @@ spec:
             - name: EN_API_SEND_RAW_TX_SYNC_DEFAULT_TIMEOUT_MS
               value: {{ .Values.rpc.sendRawTxSyncDefaultTimeout | quote }}
             {{- end }}
+            {{- if .Values.otel.enabled }}
+{{- include "abstract-node.otelEnv" . | nindent 12 }}
+            {{- end }}
             {{- range $name, $value := .Values.node.extraEnv }}
             - name: {{ $name | quote }}
               value: {{ $value | quote }}

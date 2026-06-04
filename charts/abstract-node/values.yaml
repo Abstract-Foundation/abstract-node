@@ -289,6 +289,15 @@ metrics:
     ##
     rules: []
 
+otel:
+  ## Configure OpenTelemetry environment variables for the external node container.
+  ##
+  enabled: false
+  level: info
+  endpoint: ""
+  serviceName: ""
+  extendedRpcTracing: false
+
 ## Configure resource requests and limits.
 ## http://kubernetes.io/docs/user-guide/compute-resources/
 ##
