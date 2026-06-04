@@ -1,3 +1,5 @@
+{{- $kubeVersion := .Capabilities.KubeVersion.Version | trimPrefix "v" -}}
+{{- $supportsStopSignal := semverCompare ">=1.33.0-0" $kubeVersion -}}
 ---
 apiVersion: {{ include "common.capabilities.statefulset.apiVersion" . }}
 kind: StatefulSet
@@ -53,6 +55,10 @@ spec:
     {{- if .Values.terminationGracePeriodSeconds }}
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
     {{- end }}
+    {{- if $supportsStopSignal }}
+      os:
+        name: linux
+    {{- end }}
       serviceAccountName: {{ include "common.names.serviceAccountName" . }}
       priorityClassName: {{ .Values.priorityClassName | quote }}
       {{- if .Values.consensus.enabled }}
@@ -78,6 +84,10 @@ spec:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if $supportsStopSignal }}
+          lifecycle:
+            stopSignal: SIGINT
+          {{- end }}
           {{- if .Values.ha.enabled }}
           {{- $coreArgs := concat (list (printf "--components=%s" (include "abstract-node.haCoreComponents" .))) .Values.ha.core.extraArgs }}
 {{ include "abstract-node.nodeArgs" (dict "root" . "args" $coreArgs) | nindent 10 }}

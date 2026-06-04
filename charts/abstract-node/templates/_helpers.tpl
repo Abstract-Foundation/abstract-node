@@ -104,7 +104,9 @@ Render external node command / args, preserving the existing shutdown wrapper be
 {{- define "abstract-node.nodeArgs" -}}
 {{- $root := .root -}}
 {{- $args := default (list) .args -}}
-{{- if $root.Values.shutdownWrapper.enabled }}
+{{- $kubeVersion := $root.Capabilities.KubeVersion.Version | trimPrefix "v" -}}
+{{- $supportsStopSignal := semverCompare ">=1.33.0-0" $kubeVersion -}}
+{{- if and $root.Values.shutdownWrapper.enabled (not $supportsStopSignal) }}
 command:
   - /bin/sh
   - -ec

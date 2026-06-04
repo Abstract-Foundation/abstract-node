@@ -1,4 +1,6 @@
 {{- if .Values.ha.enabled }}
+{{- $kubeVersion := .Capabilities.KubeVersion.Version | trimPrefix "v" -}}
+{{- $supportsStopSignal := semverCompare ">=1.33.0-0" $kubeVersion -}}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -46,12 +48,20 @@ spec:
     {{- if .Values.terminationGracePeriodSeconds }}
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
     {{- end }}
+    {{- if $supportsStopSignal }}
+      os:
+        name: linux
+    {{- end }}
       serviceAccountName: {{ include "common.names.serviceAccountName" . }}
       priorityClassName: {{ .Values.priorityClassName | quote }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if $supportsStopSignal }}
+          lifecycle:
+            stopSignal: SIGINT
+          {{- end }}
           {{- $apiArgs := concat (list (printf "--components=%s" (include "abstract-node.haApiComponents" .))) .Values.ha.api.extraArgs }}
 {{ include "abstract-node.nodeArgs" (dict "root" . "args" $apiArgs) | nindent 10 }}
           env:
