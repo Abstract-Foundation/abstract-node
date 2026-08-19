@@ -79,7 +79,7 @@ image:
   registry: docker.io
   repository: matterlabs/external-node
   pullPolicy: IfNotPresent
-  tag: "v31.1.0"
+  tag: "f11180bd-1786191203"
 
 shutdownWrapper:
   enabled: false
