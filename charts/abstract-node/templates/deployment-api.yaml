@@ -1,6 +1,6 @@
 {{- if .Values.ha.enabled }}
 {{- $kubeVersion := .Capabilities.KubeVersion.Version | trimPrefix "v" -}}
-{{- $supportsStopSignal := semverCompare ">=1.33.0-0" $kubeVersion -}}
+{{- $supportsStopSignal := and .Values.shutdownWrapper.nativeStopSignal.enabled (semverCompare ">=1.33.0-0" $kubeVersion) -}}
 ---
 apiVersion: apps/v1
 kind: Deployment
