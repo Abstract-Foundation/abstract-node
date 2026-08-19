@@ -127,7 +127,7 @@ Render external node command / args, preserving the existing shutdown wrapper be
 {{- $root := .root -}}
 {{- $args := default (list) .args -}}
 {{- $kubeVersion := $root.Capabilities.KubeVersion.Version | trimPrefix "v" -}}
-{{- $supportsStopSignal := semverCompare ">=1.33.0-0" $kubeVersion -}}
+{{- $supportsStopSignal := and $root.Values.shutdownWrapper.nativeStopSignal.enabled (semverCompare ">=1.33.0-0" $kubeVersion) -}}
 {{- if and $root.Values.shutdownWrapper.enabled (not $supportsStopSignal) }}
 command:
   - /bin/sh

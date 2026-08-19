@@ -83,6 +83,8 @@ image:
 
 shutdownWrapper:
   enabled: false
+  nativeStopSignal:
+    enabled: false
 
 ## Additional arguments for the single-instance external node container.
 ## In HA mode, use ha.core.extraArgs / ha.api.extraArgs instead.

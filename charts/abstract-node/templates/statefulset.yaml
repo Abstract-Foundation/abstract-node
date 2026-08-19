@@ -1,5 +1,5 @@
 {{- $kubeVersion := .Capabilities.KubeVersion.Version | trimPrefix "v" -}}
-{{- $supportsStopSignal := semverCompare ">=1.33.0-0" $kubeVersion -}}
+{{- $supportsStopSignal := and .Values.shutdownWrapper.nativeStopSignal.enabled (semverCompare ">=1.33.0-0" $kubeVersion) -}}
 ---
 apiVersion: {{ include "common.capabilities.statefulset.apiVersion" . }}
 kind: StatefulSet
