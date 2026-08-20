@@ -62,6 +62,19 @@ Create the name of the service account to use
 {{- end }}
 
 {{/*
+External node image, optionally pinned by digest.
+*/}}
+{{- define "abstract-node.image" -}}
+{{- $tag := .Values.image.tag | default .Chart.AppVersion -}}
+{{- $image := printf "%s/%s:%s" .Values.image.registry .Values.image.repository $tag -}}
+{{- with .Values.image.digest -}}
+{{- printf "%s@%s" $image . -}}
+{{- else -}}
+{{- $image -}}
+{{- end -}}
+{{- end }}
+
+{{/*
 Render OpenTelemetry environment variables for the external node container.
 */}}
 {{- define "abstract-node.otelEnv" -}}
