@@ -64,7 +64,7 @@ spec:
       {{- if .Values.consensus.enabled }}
       initContainers:
       - name: init-consensus-secrets
-        image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        image: "{{ include "abstract-node.image" . }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         command:
         - "/bin/sh"
@@ -82,7 +82,7 @@ spec:
       {{- end }}
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          image: "{{ include "abstract-node.image" . }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- if $supportsStopSignal }}
           lifecycle:
