@@ -80,7 +80,7 @@ image:
   repository: matterlabs/external-node
   pullPolicy: IfNotPresent
   tag: "9734bf2-1787057993929"
-  digest: "sha256:0bbcb2ffceca37f9f2b0d4e0f243b2fe636f4080103f62b50419f67a77d8f60a"
+  digest: "sha256:5dadc06bdf3bb09b7ac508e6761e164bca22fae09860cf8bc57041302f80f40b"
 
 shutdownWrapper:
   enabled: false
