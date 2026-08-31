@@ -13,13 +13,24 @@ services:
       - grafana-data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning
     environment:
-      GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"
+      # Anonymous access is enabled and the login form is disabled, so this role is
+      # granted to every request that reaches Grafana. "Admin" would let anyone with
+      # access to port 3000 (including anything on the host or an SSH tunnel) create
+      # datasources, which Grafana proxies server-side and can be abused to reach
+      # internal endpoints such as the cloud metadata service. "Viewer" still allows
+      # reading the provisioned dashboards; set GRAFANA_ANONYMOUS_ROLE=Admin to
+      # restore the previous behaviour if you edit dashboards from the UI.
+      GF_AUTH_ANONYMOUS_ORG_ROLE: "${GRAFANA_ANONYMOUS_ROLE:-Viewer}"
       GF_AUTH_ANONYMOUS_ENABLED: "true"
       GF_AUTH_DISABLE_LOGIN_FORM: "true"
     ports:
       - "127.0.0.1:3000:3000"
   postgres:
     image: "postgres:16"
+    # The external node is "restart: always" and depends on postgres being healthy.
+    # Without a restart policy here, a postgres crash or a host reboot leaves the
+    # database stopped and the node stuck in a restart loop until manual action.
+    restart: always
     command: >
       postgres
       -c max_connections=200
