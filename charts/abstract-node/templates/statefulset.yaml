@@ -323,6 +323,11 @@ spec:
         {{- end }}
       {{- end }}
       volumes:
+        {{- if .Values.consensus.enabled }}
+        - name: consensus-config
+          configMap:
+            name: {{ include "common.names.fullname" . }}-consensus
+        {{- end }}
 {{- if (not .Values.persistence.enabled) }}
         - name: statekeeper
           emptyDir: {}
