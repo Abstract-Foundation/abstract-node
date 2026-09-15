@@ -25,7 +25,7 @@ spec:
       port: {{ .Values.rpc.ws.port }}
       targetPort: ws
   {{- end }}
-  {{- if .Values.global.metrics.enabled }}
+  {{- if or .Values.global.metrics.enabled .Values.metrics.enabled }}
     - name: metrics
       port: {{ .Values.metrics.port }}
       targetPort: metrics
