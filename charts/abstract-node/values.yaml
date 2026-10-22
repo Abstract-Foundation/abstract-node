@@ -79,8 +79,8 @@ image:
   registry: docker.io
   repository: matterlabs/external-node
   pullPolicy: IfNotPresent
-  tag: "9734bf2-1787057993929"
-  digest: "sha256:5dadc06bdf3bb09b7ac508e6761e164bca22fae09860cf8bc57041302f80f40b"
+  tag: "v33.1.0"
+  digest: "sha256:480edbd9257a618e925c25f547693ba4b552534ba15c11c5fdf357eda1b8779e"
 
 shutdownWrapper:
   enabled: false
