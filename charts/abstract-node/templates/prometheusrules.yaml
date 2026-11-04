@@ -23,13 +23,13 @@ spec:
   {{- if .Values.metrics.prometheusRule.default }}
     - name: {{ include "common.names.fullname" $ }}-default
       rules:
-        - alert: RethNodeDown
+        - alert: AbstractExternalNodeDown
           expr: up{job="{{ include "common.names.fullname" . }}"} == 0
           for: 5m
           labels:
             severity: critical
           annotations:
-            summary: Reth Node {{ printf "{{ $labels.instance }}" }} down
-            description: Reth Node {{ printf "{{ $labels.instance }}" }} is down
+            summary: Abstract External Node {{ printf "{{ $labels.instance }}" }} down
+            description: Abstract External Node {{ printf "{{ $labels.instance }}" }} is down
   {{- end }}
 {{- end }}
