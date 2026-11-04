@@ -11,7 +11,7 @@ spec:
   clusterIP: None
   type: ClusterIP
   ports:
-  {{- if .Values.global.metrics.enabled }}
+  {{- if or .Values.global.metrics.enabled .Values.metrics.enabled }}
     - name: metrics
       port: {{ .Values.metrics.port }}
       targetPort: metrics
