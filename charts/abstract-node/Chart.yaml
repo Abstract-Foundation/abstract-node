@@ -11,7 +11,7 @@ keywords:
 home: https://abs.xyz
 sources:
   - https://github.com/matter-labs/zksync-era
-appVersion: "v34.0.0-alpha"
+appVersion: "v34.0.1"
 
 dependencies:
   - name: common

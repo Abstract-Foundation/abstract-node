@@ -52,7 +52,7 @@ services:
   # Generation of consensus secrets.
   # The secrets are generated iff the secrets file doesn't already exist.
   generate-secrets:
-    image: "matterlabs/external-node:${EN_VERSION:-v34.0.0-alpha}@${EN_DIGEST:-sha256:21eb7f50d7134f14d98c0a98353e4822649ea01df12af070acb31da1a292b1fe}"
+    image: "matterlabs/external-node:${EN_VERSION:-v34.0.1}@${EN_DIGEST:-sha256:ba3d1030097478a2d218b81d33aa2791507bac887cd43b98dd52492c52e695b8}"
     entrypoint:
       [
       "/configs/generate_secrets.sh",
@@ -61,7 +61,7 @@ services:
     volumes:
       - ./configs:/configs
   external-node:
-    image: "matterlabs/external-node:${EN_VERSION:-v34.0.0-alpha}@${EN_DIGEST:-sha256:21eb7f50d7134f14d98c0a98353e4822649ea01df12af070acb31da1a292b1fe}"
+    image: "matterlabs/external-node:${EN_VERSION:-v34.0.1}@${EN_DIGEST:-sha256:ba3d1030097478a2d218b81d33aa2791507bac887cd43b98dd52492c52e695b8}"
     entrypoint: ["/usr/bin/entrypoint.sh"]
     restart: always
     depends_on:
